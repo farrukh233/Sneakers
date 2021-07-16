@@ -6,7 +6,7 @@
 
 Stack:
 
-ReactJS + хуки
-React Router
-Axios
-SCSS
+* ReactJS + хуки
+* React Router
+* Axios
+* SCSS
