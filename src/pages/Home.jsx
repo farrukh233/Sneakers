@@ -5,7 +5,7 @@ function Home({
   searchValue,
   setSearchValue,
   onChangeSearchInput,
-  onAddToFavorie,
+  onAddToFavorite,
   onAddToCart,
 }) {
   return (
@@ -41,7 +41,7 @@ function Home({
               title={item.title}
               price={item.price}
               imageUrl={item.imageUrl}
-              onFavorite={obj => onAddToFavorie(obj)}
+              onFavorite={obj => onAddToFavorite(obj)}
               onPlus={obj => onAddToCart(obj)}
             />
           ))}
