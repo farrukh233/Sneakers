@@ -12,29 +12,47 @@ function App() {
   const [favorites, setFavorites] = React.useState([]);
   const [cartOpened, setCartOpened] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    axios.get("https://60e358636c365a0017839276.mockapi.io/items").then(res => {
-      setItems(res.data);
-    });
-    axios.get("https://60e358636c365a0017839276.mockapi.io/cart").then(res => {
-      setCartItems(res.data);
-    });
-    axios
-      .get("https://60e358636c365a0017839276.mockapi.io/favorites")
-      .then(res => {
-        setFavorites(res.data);
-      });
+    async function fetchData() {
+      const cartResponse = await axios.get(
+        "https://60e358636c365a0017839276.mockapi.io/cart"
+      );
+
+      const favoriteResponse = await axios.get(
+        "https://60e358636c365a0017839276.mockapi.io/favorites"
+      );
+
+      const itemsResponse = await axios.get(
+        "https://60e358636c365a0017839276.mockapi.io/items"
+      );
+      setIsLoading(false);
+      setItems(itemsResponse.data);
+      setCartItems(cartResponse.data);
+      setFavorites(favoriteResponse.data);
+    }
+
+    fetchData();
   }, []);
 
   const onAddToCart = obj => {
-    axios.post("https://60e358636c365a0017839276.mockapi.io/cart", obj);
-    setCartItems(prev => [...prev, obj]);
+    if (cartItems.find(item => Number(item.id) === Number(obj.id))) {
+      axios.delete(
+        `https://60e358636c365a0017839276.mockapi.io/cart/${obj.id}`
+      );
+      setCartItems(prev =>
+        prev.filter(item => Number(item.id) !== Number(obj.id))
+      );
+    } else {
+      axios.post("https://60e358636c365a0017839276.mockapi.io/cart", obj);
+      setCartItems(prev => [...prev, obj]);
+    }
   };
 
   const onRemoveItem = id => {
     axios.delete(`https://60e358636c365a0017839276.mockapi.io/cart/${id}`);
-    setCartItems(prev => prev.filter(item => item.id) != id);
+    setCartItems(prev => prev.filter(item => item.id !== id));
   };
 
   const onAddToFavorite = async obj => {
@@ -73,11 +91,13 @@ function App() {
       <Route path='/' exact>
         <Home
           items={items}
+          cartItems={cartItems}
           searchValue={searchValue}
           setSearchValue={setSearchValue}
           onChangeSearchInput={onChangeSearchInput}
           onAddToFavorite={onAddToFavorite}
           onAddToCart={onAddToCart}
+          isLoading={isLoading}
         />
       </Route>
 
